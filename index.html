@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .view-port {
+            margin: 0;
+            padding: 0;
+            width: 500px;
+            height: 300px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* background-color: grey; */
+            overflow: hidden;
+        }
+
+        .images-container {
+            margin: 0;
+            padding: 0;
+            width: inherit;
+            height: inherit;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .card {
+            margin: 0;
+            padding: 0;
+            width: inherit;
+            height: inherit;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .card-img {
+            max-width: 100%;
+            max-height: 100%;
+            position: relative;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .nav-buttons-container {
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .nav-button {
+            width: 50%;
+            height: auto;
+            cursor: pointer;
+            pointer-events: all;
+        }
+
+        .selection-buttons-container {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 20px;
+            position: absolute;
+            /* bottom: 0; */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            align-items: center;
+            /* background-color: rgba(0, 0, 255, 0.3); */
+            pointer-events: none;
+        }
+
+        .selection-button {
+            margin: 0;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: grey;
+            pointer-events: all;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav-buttons-container">
+        <img src="./prev.png" alt="prev" class="nav-button" id="prev">
+        <img src="./next.png" alt="next" class="nav-button" id="next">
+    </div>
+    <div class="view-port">
+        <div class="images-container">
+            <div class="card" id="one"><img src="https://picsum.photos/800/350" class="card-img" /></div>
+            <div class="card" id="two"><img src="https://picsum.photos/800/352" class="card-img" /></div>
+            <div class="card" id="three"><img src="https://picsum.photos/800/354" class="card-img" /></div>
+        </div>
+    </div>
+    <div class="selection-buttons-container"></div>
+
+    <script>
+        const view_port = document.querySelector('.view-port'),
+            images = document.querySelector('.images-container'),
+            card_width = parseFloat(getComputedStyle(images.children[0]).width),
+            number_of_cards_by_index = images.children.length - 1,
+            middle_card_by_index = Math.floor(number_of_cards_by_index / 2),
+            nav_buttons_container = document.querySelector('.nav-buttons-container'),
+            button_prev = document.querySelector('#prev'),
+            button_next = document.querySelector('#next'),
+            selection_buttons_container = document.querySelector('.selection-buttons-container');
+        let current_card = middle_card_by_index;
+
+        for (let i = 0; i < images.children.length; i++) {
+            selection_buttons_container.innerHTML += `<div class="selection-button"></div>`;
+        }
+
+        // update_selection();
+
+        /* ************* RESPONSIVE CODE ************* */
+        let new_width = 0.0,
+            img_width_as_percentage = 50,
+            nav_buttons_placement_as_percentage = 60;
+        img_width_as_percentage = window.innerWidth < 768 ? 100 : img_width_as_percentage;
+        nav_buttons_placement_as_percentage = window.innerWidth < 768 ? 100 : nav_buttons_placement_as_percentage;
+
+        new_width =
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ?
+            (img_width_as_percentage / 100) * window.screen.width :
+            (img_width_as_percentage / 100) * window.innerWidth;
+
+        view_port.style.width = `${new_width}px`;
+        button_prev.style.width = `${(new_width / 2) * 0.30}px`;
+        button_next.style.width = `${(new_width / 2) * 0.30}px`;
+        nav_buttons_container.style.width = `${nav_buttons_placement_as_percentage}vw`;
+
+        selection_buttons_container.style.width = `${new_width / 2}px`;
+        selection_buttons_container.style.bottom = `${view_port.getBoundingClientRect().top}px`;
+        for (let i = 0; i < images.children.length; i++) {
+            selection_buttons_container.children[i].style.transitionDuration = '0.0s';
+            selection_buttons_container.children[i].style.width = `${new_width * 0.03}px`;
+            selection_buttons_container.children[i].style.height = `${new_width * 0.03}px`;
+        }
+
+
+        window.addEventListener('resize', () => {
+            img_width_as_percentage = 50;
+            nav_buttons_placement_as_percentage = 60;
+            nav_buttons_placement_as_percentage = window.innerWidth < 768 ? 100 : nav_buttons_placement_as_percentage;
+            img_width_as_percentage = window.innerWidth < 768 ? 100 : img_width_as_percentage;
+
+            new_width =
+                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ?
+                (img_width_as_percentage / 100) * window.screen.width :
+                (img_width_as_percentage / 100) * window.innerWidth;
+
+            view_port.style.width = `${new_width}px`;
+            selection_buttons_container.style.bottom = `${view_port.getBoundingClientRect().top}px`;
+            button_prev.style.width = `${(new_width / 2) * 0.30}px`;
+            button_next.style.width = `${(new_width / 2) * 0.30}px`;
+            nav_buttons_container.style.width = `${nav_buttons_placement_as_percentage}vw`;
+
+            selection_buttons_container.style.width = `${new_width / 2}px`;
+            for (let i = 0; i < images.children.length; i++) {
+                selection_buttons_container.children[i].style.transitionDuration = '0.0s';
+                selection_buttons_container.children[i].style.width = `${new_width * 0.03}px`;
+                selection_buttons_container.children[i].style.height = `${new_width * 0.03}px`;
+            }
+
+            order_cards();
+
+            right_boundary = parseFloat(images.children[number_of_cards_by_index].style.left) + new_width,
+                left_boundary = parseFloat(images.children[0].style.left) - new_width;
+
+            for (let i = 0; i < images.children.length; i++) {
+                last_positions[i] = parseFloat(images.children[i].style.left);
+            }
+        });
+        /* ******************************************* */
+
+        function update_selection() {
+            for (let i = 0; i < images.children.length; i++) {
+                i === current_card ?
+                    selection_buttons_container.children[i].style.backgroundColor = 'red' :
+                    selection_buttons_container.children[i].style.backgroundColor = 'grey';
+            }
+        }
+
+        function handle_boundaries() {
+            if (Math.round(last_positions[0]) <= left_boundary) {
+                const end_of_deck = last_positions[number_of_cards_by_index] + new_width;
+
+                images.children[0].style.left = `${end_of_deck}px`;
+                last_positions[0] = end_of_deck;
+
+                images.appendChild(images.children[0], images.children[number_of_cards_by_index]);
+                last_positions.splice(number_of_cards_by_index, 0, last_positions.shift());
+            }
+
+            if (Math.round(last_positions[number_of_cards_by_index]) >= right_boundary) {
+                const beginning_of_deck = last_positions[0] - new_width;
+
+                images.children[number_of_cards_by_index].style.left = `${beginning_of_deck}px`;
+                last_positions[number_of_cards_by_index] = beginning_of_deck;
+
+                images.insertBefore(images.children[number_of_cards_by_index], images.children[0]);
+                last_positions.splice(0, 0, last_positions.pop());
+            }
+        }
+
+        function order_cards() {
+            let counter_for_right = 1,
+                counter_for_left = middle_card_by_index;
+
+            for (let i = 0; i < images.children.length; i++) {
+                images.children[i].style.transitionDuration = '0.0s';
+
+                if (i < middle_card_by_index) {
+                    images.children[i].style.left = `-${(counter_for_left * new_width) - (new_width / 2)}px`;
+                    counter_for_left--;
+                } else if (i > middle_card_by_index) {
+                    images.children[i].style.left = `${(counter_for_right * new_width) + (new_width / 2)}px`;
+                    counter_for_right++;
+                } else {
+                    images.children[i].style.left = `${new_width / 2}px`;
+                }
+            }
+        }
+
+        order_cards();
+
+        const last_positions = [];
+        let right_boundary = parseFloat(images.children[number_of_cards_by_index].style.left) + new_width,
+            left_boundary = parseFloat(images.children[0].style.left) - new_width;
+
+        for (let i = 0; i < images.children.length; i++) {
+            last_positions.push(parseFloat(images.children[i].style.left));
+        }
+
+        /* ************* BUTTON NAV ****************** */
+        let scroll_in_progress = false;
+
+        button_next.addEventListener('click', () => {
+            if (scroll_in_progress) return;
+
+            scroll_in_progress = true;
+
+            for (let i = 0; i < images.children.length; i++) {
+                const updated_position = last_positions[i] - new_width;
+
+                images.children[i].style.left = `${updated_position}px`;
+                last_positions[i] = updated_position;
+            }
+
+            current_card = (current_card === number_of_cards_by_index) ? 0 : ++current_card;
+
+            handle_boundaries();
+            update_selection();
+
+            setTimeout(() => {
+                scroll_in_progress = false;
+                start_autoplay();
+            }, 100);
+        });
+
+        button_prev.addEventListener('click', () => {
+            if (scroll_in_progress) return;
+
+            scroll_in_progress = true;
+
+            for (let i = 0; i < images.children.length; i++) {
+                const updated_position = last_positions[i] + new_width;
+
+                images.children[i].style.left = `${updated_position}px`;
+                last_positions[i] = updated_position;
+            }
+
+            current_card = (current_card === 0) ? number_of_cards_by_index : --current_card;
+
+            handle_boundaries();
+            update_selection();
+
+            setTimeout(() => {
+                scroll_in_progress = false;
+                start_autoplay();
+            }, 100);
+        });
+        /* ******************************************* */
+
+        /* ************* SELECTION NAV *************** */
+        selection_buttons_container.addEventListener('click', event => {
+            if (event.target === selection_buttons_container) return;
+
+            let new_card = null;
+
+            for (let i = 0; i < images.children.length; i++) {
+                if (event.target === selection_buttons_container.children[i]) new_card = i;
+            }
+
+            for (let i = 0; i < images.children.length; i++) {
+                const updated_position = last_positions[i] + ((current_card - new_card) * new_width);
+
+                images.children[i].style.left = `${updated_position}px`;
+                last_positions[i] = updated_position;
+            }
+
+            for (let i = 0; i < Math.abs(current_card - new_card); i++) {
+                handle_boundaries();
+            }
+
+            current_card = new_card;
+            update_selection();
+            start_autoplay();
+        });
+        /* ******************************************* */
+
+        /* ************* AUTOPLAY CODE *************** */
+        let autoplay_timeout_id = null,
+            autoplay_interval_id = null;
+
+        function start_autoplay() {
+            clearTimeout(autoplay_timeout_id);
+            clearInterval(autoplay_interval_id);
+
+            autoplay_timeout_id = setTimeout(() => {
+                autoplay_interval_id = setInterval(() => {
+                    for (let i = 0; i < images.children.length; i++) {
+                        const updated_position = last_positions[i] - new_width;
+
+                        images.children[i].style.left = `${updated_position}px`;
+                        last_positions[i] = updated_position;
+                    }
+
+                    current_card = (current_card === number_of_cards_by_index) ? 0 : ++current_card;
+
+                    handle_boundaries();
+                    update_selection();
+                }, 1100);
+            }, 1500);
+        }
+        /* ******************************************* */
+
+        selection_buttons_container.children[0].click();
+        // start_autoplay();
+    </script>
+</body>
+
+</html>
