@@ -212,7 +212,7 @@
         }
 
         function handle_boundaries() {
-            if (Math.round(last_positions[0]) <= left_boundary) {
+            if (Math.round(last_positions[0]) <= Math.round(left_boundary)) {
                 const end_of_deck = last_positions[number_of_cards_by_index] + new_width;
 
                 images.children[0].style.left = `${end_of_deck}px`;
@@ -222,7 +222,7 @@
                 last_positions.splice(number_of_cards_by_index, 0, last_positions.shift());
             }
 
-            if (Math.round(last_positions[number_of_cards_by_index]) >= right_boundary) {
+            if (Math.round(last_positions[number_of_cards_by_index]) >= Math.round(right_boundary)) {
                 const beginning_of_deck = last_positions[0] - new_width;
 
                 images.children[number_of_cards_by_index].style.left = `${beginning_of_deck}px`;
